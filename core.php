@@ -1,7 +1,8 @@
 <?php
 
-require_once("settings/constants.php");
-require_once("settings/localization.php");
+// These are default settings
+require_once("default_settings/constants.php");
+require_once("default_settings/localization.php");
 
 require_once("classes/Session.php");
 require_once("classes/Cookie.php");
@@ -30,7 +31,6 @@ require_once("classes/Image.php");
 
 require_once("classes/Language.php");
 require_once("classes/WebPage.php");
-//require_once("classes/WebSite.php");
 
 Framework::SetDebug(true);
 ob_start("ob_gzhandler");

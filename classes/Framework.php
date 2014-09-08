@@ -1,6 +1,5 @@
 <?php
 
-use JShrink\Minifier;
 class Framework 
 {
 	public $debugger;
@@ -39,7 +38,6 @@ class Framework
 		}
 		else if ( $type == "js" )
 		{
-			//return \JShrink\Minifier::minify(file_get_contents($href));
 			return self::MinifyJS($href);
 		}
 		else
