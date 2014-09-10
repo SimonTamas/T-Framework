@@ -9,7 +9,7 @@ class Obfuscator extends Framework
 	public static function GetCodedString($string)
 	{
 		$sql = new SqlServer(true);
-		$nameKeys = $sql->Query("SELECT varName,varType,varKey FROM obfuscatednames");
+		$nameKeys = $sql->Query("SELECT varName,varType,varKey FROM obfuscatednames ORDER BY CHAR_LENGTH(varName) DESC");
 		for ( $i = 0 ; $i < $sql->NumRows($nameKeys) ; $i++ )
 		{
 			$name = $sql->Result($nameKeys,$i);
@@ -27,6 +27,8 @@ class Obfuscator extends Framework
 				}
 			}
 		}
+		$sql->Disconnect();
+		$sql = null;
 		// Just to make sure we dont obfuscate TWICE
 		$string = str_replace("&tempId","#",$string);
 		$string = str_replace("&tempClass",".",$string);

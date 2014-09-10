@@ -64,22 +64,10 @@ class Framework
 		$sql = new SqlServer(true);
 		
 		// LanguageQuery
-		$langQuery = "CREATE TABLE IF NOT EXISTS `language` (
-		  `entry` int(11) NOT NULL AUTO_INCREMENT,
-		  `langKey` varchar(50) DEFAULT NULL,
-		  `hu` mediumtext CHARACTER SET utf8,
-		  `eng` mediumtext CHARACTER SET utf8,
-		  PRIMARY KEY (`entry`)
-		) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;";
+		$langQuery = "CREATE TABLE IF NOT EXISTS `language` (`entry` int(11) NOT NULL AUTO_INCREMENT,`langKey` varchar(50) DEFAULT NULL,`hu` mediumtext CHARACTER SET utf8,`eng` mediumtext CHARACTER SET utf8,PRIMARY KEY (`entry`)) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1";
 		
 		// Obfuscated names Query
-		$obfsQuery = "CREATE TABLE IF NOT EXISTS `obfuscatednames` (
-		  `entry` int(11) NOT NULL AUTO_INCREMENT,
-		  `varName` varchar(50) DEFAULT NULL,
-		  `varType` varchar(5) DEFAULT NULL,
-		  `varKey` varchar(10) DEFAULT NULL,
-		  PRIMARY KEY (`entry`)
-		) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;";
+		$obfsQuery = "CREATE TABLE IF NOT EXISTS `obfuscatednames` (`entry` int(11) NOT NULL AUTO_INCREMENT, `varName` varchar(50) DEFAULT NULL,`varType` varchar(5) DEFAULT NULL,`varKey` varchar(10) DEFAULT NULL,PRIMARY KEY (`entry`)) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1";
 		
 		$sql->Query($langQuery);
 		$sql->Query($obfsQuery);

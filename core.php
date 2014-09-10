@@ -34,7 +34,7 @@ require_once("classes/Language.php");
 require_once("classes/WebPage.php");
 
 Framework::SetDebug(true);
-Framework::CreateTables();
+//Framework::CreateTables();
 ob_start("ob_gzhandler");
 
 
