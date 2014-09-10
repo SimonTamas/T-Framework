@@ -2,6 +2,7 @@
 
 class SqlServer extends Framework
 {
+	private $isConneted;
 	private $connection; 	
 	private $hostname;
 	private $user;
@@ -58,6 +59,11 @@ class SqlServer extends Framework
 		{
 			mysql_close($this->connection);
 		}
+		$this->connection = null;
+		$this->isConnected = null;
+		$this->hostname = null;
+		$this->pass = null;
+		$this->user = null;
 	}
 	
 	public function GetTable($tableName)

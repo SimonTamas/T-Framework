@@ -8,6 +8,7 @@ require_once("classes/Session.php");
 require_once("classes/Cookie.php");
 require_once("classes/ClosureCompiler.php");
 require_once("classes/Framework.php");
+require_once("classes/Obfuscator.php");
 require_once("classes/Cacher.php");
 require_once("classes/Functions.php");
 require_once("classes/SqlServer.php");
@@ -33,6 +34,7 @@ require_once("classes/Language.php");
 require_once("classes/WebPage.php");
 
 Framework::SetDebug(true);
+Framework::CreateTables();
 ob_start("ob_gzhandler");
 
 

@@ -7,7 +7,7 @@ class ElementProperty
 	
 	public function GetHTML()
 	{
-		return " " . $this->GetName() . "='" . $this->GetValue() . "'";
+		return " " . $this->GetName() . "='" . $this->GetValue(true) . "'";
 	}
 	
 	public function GetName()
@@ -15,13 +15,20 @@ class ElementProperty
 		return $this->propertyName;
 	}
 	
-	public function GetValue()
+	public function GetValue($obfuscate=false)
 	{
 		$propertyValues = "";
 		$valuesCount = count($this->propertyValues);
 		for ( $i = 0 ; $i < $valuesCount ; $i++ )
 		{
-			$propertyValues .= $this->propertyValues[$i];
+			if ( $obfuscate && ($this->GetName() == "id" || $this->GetName() == "class") )
+			{
+				$propertyValues .= Obfuscator::GetKey($this->propertyValues[$i],$this->GetName());
+			}
+			else
+			{
+				$propertyValues .= $this->propertyValues[$i];
+			}
 			if ( $i+1 < $valuesCount )
 			{
 				$propertyValues .= " ";

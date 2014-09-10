@@ -8,9 +8,9 @@ class Script extends Element
 	private $boolLoadAsync;
 	
 	
-	public function __construct($scriptSrc,$scriptType="text/javascript",$scriptCharset="UTF-8")
+	public function __construct($scriptSrc,$obfuscateScript=true,$scriptType="text/javascript",$scriptCharset="UTF-8")
 	{
-		$scriptSrc = Cacher::Cache($scriptSrc,"js");
+		$scriptSrc = Cacher::Cache($scriptSrc,"js",$obfuscateScript);
 		parent::__construct("script",array( "src" => $scriptSrc , "type" => $scriptType , "charset" => $scriptCharset));
 	}
 }
