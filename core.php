@@ -33,6 +33,8 @@ require_once("classes/Image.php");
 require_once("classes/Language.php");
 require_once("classes/WebPage.php");
 
+Framework::SetObfuscate(false);
+Framework::SetInlineHead(false);
 Framework::SetDebug(true);
 //Framework::CreateTables();
 ob_start("ob_gzhandler");

@@ -5,9 +5,9 @@ class ElementProperty
 	private $propertyName;	
 	private $propertyValues;
 	
-	public function GetHTML()
+	public function GetHTML($obfuscate=false)
 	{
-		return " " . $this->GetName() . "='" . $this->GetValue(true) . "'";
+		return " " . $this->GetName() . "=\"" . $this->GetValue($obfuscate) . "\"";
 	}
 	
 	public function GetName()

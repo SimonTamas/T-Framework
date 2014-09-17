@@ -6,6 +6,32 @@ class Obfuscator extends Framework
 	public static $obfuscatedCache = array();
 	public static $nameExceptions = array("fb-root","fb-like-box");
 	
+	public static function AddExceptions($exceptions)
+	{
+		for ( $i = 0 ; $i < count($exceptions) ; $i++ )
+		{
+			self::AddException($exceptions[$i]);
+		}
+	}
+	
+	public static function AddException($name)
+	{
+		array_push(self::$nameExceptions,$name);
+	}
+	
+	public static function IsException($name)
+	{
+		for ( $i = 0 ; $i < count(self::$nameExceptions) ; $i++ )
+		{ 
+			$pos = strpos($name,self::$nameExceptions[$i]);
+			if ( $pos !== false && $pos == 0 )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static function GetCodedString($string)
 	{
 		$sql = new SqlServer(true);
@@ -13,7 +39,7 @@ class Obfuscator extends Framework
 		for ( $i = 0 ; $i < $sql->NumRows($nameKeys) ; $i++ )
 		{
 			$name = $sql->Result($nameKeys,$i);
-			if ( !in_array($name, self::$nameExceptions) )
+			if ( !self::IsException($name) )
 			{
 				$type = $sql->Result($nameKeys,$i,1);
 				$key = $sql->Result($nameKeys,$i,2);
@@ -24,6 +50,7 @@ class Obfuscator extends Framework
 				else if ( $type = "class")
 				{
 					$string = str_replace(".".$name,"&tempClass".$key,$string);
+					// Javascript case when changing attribute
 				}
 			}
 		}
@@ -55,7 +82,7 @@ class Obfuscator extends Framework
 	
 	public static function GetKey($name,$type)
 	{
-		if ( in_array($name, self::$nameExceptions) ) 
+		if ( self::IsException($name) ) 
 		{
 			return $name;
 		}	
@@ -66,7 +93,7 @@ class Obfuscator extends Framework
 			if ( $type == "id" )
 			{
 				// Duplicate id, not W3C valid!
-				Debugger::JustLog("Found duplicate ID : " . $name);
+				//Debugger::JustLog("Found duplicate ID : " . $name);
 			}
 			return self::$obfuscatedCache[$name."/".$type];
 		}

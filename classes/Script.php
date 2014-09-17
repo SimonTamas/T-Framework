@@ -11,7 +11,17 @@ class Script extends Element
 	public function __construct($scriptSrc,$obfuscateScript=true,$scriptType="text/javascript",$scriptCharset="UTF-8")
 	{
 		$scriptSrc = Cacher::Cache($scriptSrc,"js",$obfuscateScript);
-		parent::__construct("script",array( "src" => $scriptSrc , "type" => $scriptType , "charset" => $scriptCharset));
+		if ( strlen($scriptSrc) > 0 )
+		{
+			if ( Framework::$inlineHead  )
+			{
+				parent::__construct("script",array("type" => $scriptType , "charset" => $scriptCharset),file_get_contents($scriptSrc));
+			}
+			else 
+			{
+				parent::__construct("script",array( "src" => $scriptSrc , "type" => $scriptType , "charset" => $scriptCharset));
+			}
+		}
 	}
 }
 

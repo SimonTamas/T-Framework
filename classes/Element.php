@@ -104,18 +104,18 @@ class Element extends Framework
 	}
 		
 	
-	public function GetHTML()
+	public function GetHTML($obfuscate=false)
 	{ 	
 		$elementHTML = $this->Html();
 		for ( $i = 0 ; $i < count($this->elementChildren) ; $i++ )
 		{
 			$child = $this->elementChildren[$i];
-			$elementHTML .= $child->GetHTML();
+			$elementHTML .= $child->GetHTML($obfuscate);
 		}
- 		return $this->GetElementStartTag() . $elementHTML . $this->GetElementEndTag();
+ 		return $this->GetElementStartTag($obfuscate) . $elementHTML . $this->GetElementEndTag();
 	}
 	
-	public function GetElementProperties()
+	public function GetElementProperties($obfuscate=false)
 	{
 		$elementPropertiesString = "";
 		$elementProperties = $this->elementProperties->GetProperties();
@@ -124,7 +124,7 @@ class Element extends Framework
 			// If value isn't null
 			if ( strlen($elementProperty->GetValue()) > 0 )
 			{
-				$elementPropertiesString .= $elementProperty->GetHTML();
+				$elementPropertiesString .= $elementProperty->GetHTML($obfuscate);
 			}
 		}
 		return $elementPropertiesString;
@@ -142,15 +142,15 @@ class Element extends Framework
 	}
 
 		
-	public function GetElementStartTag()
+	public function GetElementStartTag($obfuscate=false)
 	{
 		if ( $this->IsVoidElement() )
 		{
-			return self::startTag . $this->Type() . $this->GetElementProperties() . self::endTag;
+			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::endTag;
 		}
 		else
 		{
-			return self::startTag . $this->Type() . $this->GetElementProperties() . self::closeTag;	
+			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::closeTag;	
 		}
 	}
 	

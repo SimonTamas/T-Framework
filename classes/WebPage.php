@@ -7,6 +7,8 @@ class WebPage
 	private $title;
 	private $pageName;
 	private $session;
+	private $obfuscatePage;
+	
 	private static $_instance = NULL;
 
     public static function getInstance() 
@@ -40,10 +42,11 @@ class WebPage
 		return $this->session;
 	}
 	
-	public function GetHTML()
+	public function GetHTML($obfuscated=false)
 	{
-		$html = "<!DOCTYPE html>" . $this->html->GetHTML();
-		return Framework::Minify($html);
+		$html = "<!DOCTYPE html>" . $this->html->GetHTML($obfuscated);
+		return $html;
+		//return Framework::Minify($html);
 	}
 	
 	public function SetTitle($setTo)
@@ -72,7 +75,7 @@ class WebPage
 		return $this->pageName;
 	}
 
-	public function __construct($pageName,$pageLanguage=constant_defaultLanguage)
+	public function __construct($pageName,$pageLanguage=constant_defaultLanguage,$loadDefaults=true)
 	{
 		self::$_instance = $this;
 		Debugger::SetDocument($pageName);
@@ -116,7 +119,10 @@ class WebPage
 		// ------------------------- HEAD -------------------------	
 		$head = new Head();
 		$this->html->AddElement($head);
-		ElementsLoader::LoadElementsFrom($this,"default","head");
+		if ( $loadDefaults )
+		{
+			ElementsLoader::LoadElementsFrom($this,"default","head");
+		}
 		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"head");
 		// --------------------------------------------------------
 		//
@@ -135,7 +141,10 @@ class WebPage
 		
 		$header = new Element("header");
 		$wrapper->AddElement($header);
-		ElementsLoader::LoadElementsFrom($this,"default","header");
+		if ( $loadDefaults )
+		{
+			ElementsLoader::LoadElementsFrom($this,"default","header");
+		}
 		
 		$content = new Element("div",array( "id" => "content" ));
 		$wrapper->AddElement($content);
@@ -147,7 +156,10 @@ class WebPage
 		// ----------------------- FOOTER -------------------------	
 		$footer = new Element("footer");
 		$body->AddElement($footer);
-		ElementsLoader::LoadElementsFrom($this,"default","footer");
+		if ( $loadDefaults )
+		{
+			ElementsLoader::LoadElementsFrom($this,"default","footer");
+		}
 		// --------------------------------------------------------
 		
 	}

@@ -5,11 +5,17 @@ class Session
 {
 	public static function Get($key)
 	{
-		if ( isset($_SESSION[$key]) )
-		{
-			return $_SESSION[$key];
-		}
-		return "";
+		return $_SESSION[$key];
+	}
+	
+	public static function Set($key,$value)
+	{
+		$_SESSION[$key] = $value;
+	}
+	
+	public static function Exists($key)
+	{
+		return isset($_SESSION[$key]);
 	}
 	
 	private function TryToContinue()
@@ -19,7 +25,10 @@ class Session
 		{
 			session_id($sessionID);
 		}
-		session_start();
+		if ( session_status() == PHP_SESSION_NONE )
+		{
+			session_start();
+		}
 	}
 	
 	public function __construct()

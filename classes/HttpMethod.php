@@ -6,12 +6,12 @@ class HttpMethod extends Framework
 	
 	public function HasValue($key)
 	{
-		return array_key_exists($key, $this->methodData);
+		return array_key_exists($key,$this->methodData) == 1;
 	}
 	
-	public function GetValue($key,$fallback="")
+	public function GetValue($key,$fallback=null)
 	{
-		if ( $this->HasValue($key) )
+		if ( $this->HasValue($key)  )
 		{
 			return $this->methodData[$key];
 		}

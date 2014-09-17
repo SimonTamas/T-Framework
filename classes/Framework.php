@@ -4,6 +4,8 @@ class Framework
 {
 	public $debugger;
 	public static $debugFramework;
+	public static $obfuscate;
+	public static $inlineHead;
 	
 	
 	public static function Minify($buffer)
@@ -14,9 +16,6 @@ class Framework
 		// Replace root with website_root
 		$buffer = str_replace('$root',constant_websiteRoot,$buffer);
 		
-		// Replace every occurance of name with key
-		$buffer = Obfuscator::GetCodedString($buffer);
-		
 		// Remove space after colons
 		$buffer = str_replace(': ', ':', $buffer);
 		
@@ -26,23 +25,39 @@ class Framework
 		return $buffer;
 	}
 	
+	public static function Obfuscate($string)
+	{
+		// Replace every occurance of name with key
+		return Obfuscator::GetCodedString($string);
+	}
+	
 	public static function MinifyJS($href,$obfuscate=true)
 	{
 		$c = new PhpClosure();
 		$c->_debug = false;
 		$compiled = $c->add($href)->returnJS();
-		if ( $obfuscate )
+		if ( self::$obfuscate && $obfuscate )
 		{
-			return Obfuscator::GetCodedString($compiled);
+			return self::Obfuscate($compiled);
 		}
 		return $compiled;
+	}
+	
+	public static function MinifyCSS($href,$obfuscate=true)
+	{
+		$minifed = self::Minify(file_get_contents($href));
+		if ( self::$obfuscate && $obfuscate )
+		{
+			return self::Obfuscate($minifed);
+		}
+		return $minifed;
 	}
 	
 	public static function MinifyFromHref($href,$type,$obfuscate=true)
 	{
 		if ( $type == "css" )
 		{
-			return self::Minify(file_get_contents($href));
+			return self::MinifyCSS($href,$obfuscate);
 		}
 		else if ( $type == "js" )
 		{
@@ -57,6 +72,16 @@ class Framework
 	public static function SetDebug($to)
 	{
 		self::$debugFramework = $to;
+	}
+	
+	public static function SetObfuscate($to)
+	{
+		self::$obfuscate = $to;
+	}
+	
+	public static function SetInlineHead($to)
+	{
+		self::$inlineHead = $to;
 	}
 	
 	public static function CreateTables()
