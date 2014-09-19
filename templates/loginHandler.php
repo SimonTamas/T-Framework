@@ -5,6 +5,8 @@ class LoginHandler
     // For ids
     const loginForm = "login-form";
     const rememberContainer = "remember-container";
+    const errorContainer = "error-container";
+
     const loginButtons = "login-buttons";
 
     // Form name constants
@@ -175,6 +177,11 @@ class LoginHandler
 
 		$rememberContainer->AddElement($rememberLabel);
 		$rememberContainer->AddElement($rememberInput);
+
+        if ( $loginState == self::loginIncorrect )
+        {
+            $errorContainer = new Element("div",array("id"=>self::errorContainer));
+        }
 		
 		// Login button
 		$loginButtonsContainer = new Element("div",array("id"=>self::loginButtons));

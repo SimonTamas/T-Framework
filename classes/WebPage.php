@@ -93,8 +93,7 @@ class WebPage
 		$languages = $this->GetLanguage()->Languages();
 		foreach ( $languages as $language )
 		{
-			$queryString = "SELECT langKey FROM language WHERE " . $language . " = '" . $pageName . "'"; 
-			Debugger::JustLog($queryString);
+			$queryString = "SELECT langKey FROM language WHERE " . $language . " = '" . $pageName . "'";
 			$pageKeyQuery = $sql->Query($queryString);
 			if ( $sql->NumRows($pageKeyQuery) > 0 )
 			{

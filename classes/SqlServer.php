@@ -3,7 +3,7 @@
 class SqlServer extends Framework
 {
 	private $isConneted;
-	private $connection; 	
+	private $mysqli;
 	private $hostname;
 	private $user;
 	private $pass;
@@ -12,52 +12,52 @@ class SqlServer extends Framework
 
 	public function Connect($user=constant_serverSqlUser,$pass=constant_serverSqlPassword,$db=constant_serverSqlDatabase)
 	{
-		$this->connection = mysql_connect($this->hostname,$user,$pass);
+        $this->mysqli = new mysqli($this->hostname,$user,$pass,$db);
 		//$this->debugger->Log("MYSQL_CONNECT");
-	    mysql_query("SET NAMES UTF8"); 
+	    $this->mysqli->query("SET NAMES UTF8");
 	}
 	
 	public function FieldCount($result)
 	{
-		if ( is_resource($result) )
+		if ( $result )
 		{
-			return mysql_num_fields($result);
+			return $result->field_count;
 		}
 		return 0;
 	}
 	
 	public function FieldName($result,$offset)
 	{
-		if ( is_resource($result) )
+		if ( $result)
 		{
-			return mysql_field_name($result,$offset);
+			return $result->fetch_fields()[$offset]->name;
 		}
 		return "unknownFieldName";
 	}
 	
 	public function NumRows($result)
 	{
-		if ( is_resource($result) )
+		if ( $result )
 		{
-			return mysql_num_rows($result);
+			return $result->num_rows;
 		}
 		return 0;
 	}
 	
 	public function Result($result,$rowOffset=0,$fieldOffset=0)
 	{
-		if ( is_resource($result) )
+		if ( $result )
 		{
-			return mysql_result($result,$rowOffset,$fieldOffset);
+			return $result->fetch_row()[$rowOffset];
 		}
 		return "?";
 	}
 	
 	public function Disconnect()
 	{
-		if ( $this->connection )
+		if ( $this->mysqli )
 		{
-			mysql_close($this->connection);
+            $this->mysqli->close();
 		}
 		$this->connection = null;
 		$this->isConnected = null;
@@ -78,12 +78,12 @@ class SqlServer extends Framework
 	
 	public function SelectDatabase($db=constant_serverSqlDatabase)
 	{
-		 mysql_select_db($db);
+        $this->mysqli->select_db($db);
 	}
 	
 	public function Query($query)
 	{
-		$result = mysql_query($query);
+		$result = $this->mysqli->query($query);
 		//$this->debugger->Log("MYSQLI_QUERY " . $query . " Error? => " . mysql_error() . "Rows : " . mysql_num_rows($result) );
 		return $result;
 	}
