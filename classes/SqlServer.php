@@ -48,7 +48,13 @@ class SqlServer extends Framework
 	{
 		if ( $result )
 		{
-			return $result->fetch_row()[$rowOffset];
+            $i = 0;
+            while (  $i < $rowOffset  )
+            {
+                $result->fetch_row();
+                $i++;
+            }
+            return $result->fetch_row()[$fieldOffset];
 		}
 		return "?";
 	}
