@@ -141,16 +141,16 @@ class LoginHandler
         }
 
         // Account input
-		$accountLabel = new Element("label",array("for"=>self::loginUserName),$accountLabelText);
-		$accountInput = new Element("input",
-				array
-				(
-						"name" => self::loginUserName,
-						"type" => "email",
-						"required" => "required",
-						"placeholder" => $webPage->GetLanguage()->GetText(self::loginUserPlaceholder)
-				)
-		);
+        $accountLabel = new Element("label",array("for"=>self::loginUserName),$accountLabelText);
+        $accountInput = new Element("input",
+            array
+            (
+                "name" => self::loginUserName,
+                "type" => "email",
+                "required" => "required",
+                "placeholder" => $webPage->GetLanguage()->GetText(self::loginUserPlaceholder)
+            )
+        );
 		
 		// Password input
 		$passwordLabel = new Element("label",array("for"=>self::loginPassName),$passwordLabelText);
