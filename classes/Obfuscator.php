@@ -36,13 +36,14 @@ class Obfuscator extends Framework
 	{
 		$sql = new SqlServer(true);
 		$nameKeys = $sql->Query("SELECT varName,varType,varKey FROM obfuscatednames ORDER BY CHAR_LENGTH(varName) DESC");
-		for ( $i = 0 ; $i < $sql->NumRows($nameKeys) ; $i++ )
+		$keysArray = SqlServer::ResultArray($nameKeys);
+		for ( $i = 0 ; $i < count($keysArray) ; $i++ )
 		{
-			$name = $sql->Result($nameKeys,$i);
+			$name = $keysArray[$i][0];
 			if ( !self::IsException($name) )
 			{
-				$type = $sql->Result($nameKeys,$i,1);
-				$key = $sql->Result($nameKeys,$i,2);
+				$type = $keysArray[$i][1];
+				$key = $keysArray[$i][2];
 				if ($type == "id" )
 				{
 					$string = str_replace("#".$name,"&tempId".$key,$string);
@@ -50,7 +51,6 @@ class Obfuscator extends Framework
 				else if ( $type = "class")
 				{
 					$string = str_replace(".".$name,"&tempClass".$key,$string);
-					// Javascript case when changing attribute
 				}
 			}
 		}

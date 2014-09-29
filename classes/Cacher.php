@@ -53,11 +53,11 @@ class Cacher extends Framework
 		return constant_websiteRoot . $type . "/" . $fileName;
 	}
 	
-	public static function Cache($href,$type,$obfuscate=true)
+	public static function Cache($href,$type,$obfuscate=true,$advancedCompilation=false)
 	{
 		if ( !Cacher::CacheExists($href,$type) || !Cacher::CacheIsFresh($href,$type) )
 		{
-			$optimizedString = Framework::MinifyFromHref($href,$type,$obfuscate);
+			$optimizedString = Framework::MinifyFromHref($href,$type,$obfuscate,$advancedCompilation);
 			return Cacher::CreateCache($href,$optimizedString,$type);
 		}
 		else

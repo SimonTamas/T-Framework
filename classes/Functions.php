@@ -6,9 +6,10 @@ class Functions extends Framework
 	{
 		$newTable = new Table(array( "class" => "pad" ));
 		$headRow = new TableRow();
-		for ( $h = 0 ; $h < mysql_num_fields($result) ; $h++ )
+		for ( $h = 0 ; $h < $result->field_count ; $h++ )
 		{
-			$newHead = new TableHead(mysql_field_name($result,$h),array( "class" => "pad" ));
+			$fieldName = mysqli_fetch_field($result)->name;
+			$newHead = new TableHead($fieldName,array( "class" => "pad" ));
 			$headRow->AddTableCell($newHead);
 		}
 		if ( $canEdit )
@@ -17,14 +18,16 @@ class Functions extends Framework
 			$headRow->AddTableCell($newHead);
 		}
 		$newTable->AddElement($headRow);
-		for ( $i = 0 ; $i < mysql_num_rows($result) ; $i++ )
+		$resultArray = SqlServer::ResultArray($result);
+		for ( $i = 0 ; $i < count($resultArray) ; $i++ )
 		{
+			$rowArray = $resultArray[$i];
 			$newRow = new TableRow();
 			$newTable->AddTableRow($newRow);
-			for ( $c = 0 ; $c < mysql_num_fields($result); $c++ )
+			for ( $c = 0 ; $c < count($rowArray) ; $c++ )
 			{
 				$newCell = new TableCell(array( "class" => "pad" ));
-				$newCell->SetHTML(mysql_result($result,$i,$c));
+				$newCell->SetHTML($resultArray[$i][$c]);
 				$newRow->AddTableCell($newCell);
 			}
 			if ( $canEdit )

@@ -118,13 +118,16 @@ class Element extends Framework
 	public function GetElementProperties($obfuscate=false)
 	{
 		$elementPropertiesString = "";
-		$elementProperties = $this->elementProperties->GetProperties();
-		foreach ( $elementProperties as $elementProperty )
+		if ( $this->elementProperties )
 		{
-			// If value isn't null
-			if ( strlen($elementProperty->GetValue()) > 0 )
+			$elementProperties = $this->elementProperties->GetProperties();
+			foreach ( $elementProperties as $elementProperty )
 			{
-				$elementPropertiesString .= $elementProperty->GetHTML($obfuscate);
+				// If value isn't null
+				if ( strlen($elementProperty->GetValue()) > 0 )
+				{
+					$elementPropertiesString .= $elementProperty->GetHTML($obfuscate);
+				}
 			}
 		}
 		return $elementPropertiesString;

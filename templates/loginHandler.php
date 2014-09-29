@@ -145,6 +145,7 @@ class LoginHandler
         $accountInput = new Element("input",
             array
             (
+            	"id" => self::loginUserName,
                 "name" => self::loginUserName,
                 "type" => "email",
                 "required" => "required",
@@ -155,24 +156,26 @@ class LoginHandler
 		// Password input
 		$passwordLabel = new Element("label",array("for"=>self::loginPassName),$passwordLabelText);
 		$passwordInput = new Element("input",
-				array
-				(
-						"name" => self::loginPassName,
-						"type" => "password",
-						"required" => "required",
-						"placeholder" =>$webPage->GetLanguage()->GetText(self::loginPassPlaceholder)
-				)
+			array
+			(
+				"id" => self::loginPassName,
+				"name" => self::loginPassName,
+				"type" => "password",
+				"required" => "required",
+				"placeholder" =>$webPage->GetLanguage()->GetText(self::loginPassPlaceholder)
+			)
 		);
 		
 		// Remember me checkbox
 		$rememberContainer = new Element("div",array("id"=>self::rememberContainer));
 		$rememberLabel = new Element("label",array("for"=>self::loginRememberName),$rememberLabelText);
 		$rememberInput = new Element("input",
-				array
-				(
-						"name" => self::loginRememberName,
-						"type" => "checkbox"
-				)
+			array
+			(
+				"id" => self::loginRememberName,
+				"name" => self::loginRememberName,
+				"type" => "checkbox"
+			)
 		);
 
 		$rememberContainer->AddElement($rememberLabel);

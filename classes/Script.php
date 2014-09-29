@@ -8,9 +8,9 @@ class Script extends Element
 	private $boolLoadAsync;
 	
 	
-	public function __construct($scriptSrc,$obfuscateScript=true,$scriptType="text/javascript",$scriptCharset="UTF-8")
+	public function __construct($scriptSrc,$obfuscateScript=true,$advancedCompilation=false,$scriptType="text/javascript",$scriptCharset="UTF-8")
 	{
-		$scriptSrc = Cacher::Cache($scriptSrc,"js",$obfuscateScript);
+		$scriptSrc = Cacher::Cache($scriptSrc,"js",$obfuscateScript,$advancedCompilation);
 		if ( strlen($scriptSrc) > 0 )
 		{
 			if ( Framework::$inlineHead  )

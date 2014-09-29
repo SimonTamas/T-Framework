@@ -31,11 +31,18 @@ class Framework
 		return Obfuscator::GetCodedString($string);
 	}
 	
-	public static function MinifyJS($href,$obfuscate=true)
+	public static function MinifyJS($href,$obfuscate=true,$advanced=false)
 	{
 		$c = new PhpClosure();
 		$c->_debug = false;
-		$compiled = $c->add($href)->returnJS();
+		if ( $advanced )
+		{
+			$compiled = $c->advancedMode()->add($href)->returnJS();
+		}
+		else
+		{
+			$compiled = $c->add($href)->returnJS();
+		}
 		if ( self::$obfuscate && $obfuscate )
 		{
 			return self::Obfuscate($compiled);
@@ -53,7 +60,7 @@ class Framework
 		return $minifed;
 	}
 	
-	public static function MinifyFromHref($href,$type,$obfuscate=true)
+	public static function MinifyFromHref($href,$type,$obfuscate=true,$advanced=false)
 	{
 		if ( $type == "css" )
 		{
@@ -61,7 +68,7 @@ class Framework
 		}
 		else if ( $type == "js" )
 		{
-			return self::MinifyJS($href,$obfuscate);
+			return self::MinifyJS($href,$obfuscate,$advanced);
 		}
 		else
 		{

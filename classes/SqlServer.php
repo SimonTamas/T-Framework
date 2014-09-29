@@ -44,17 +44,34 @@ class SqlServer extends Framework
 		return 0;
 	}
 	
+	public static function ResultArray($result)
+	{
+		if ( $result )
+		{
+			$results_array = array();
+			while ($row = $result->fetch_array(MYSQLI_NUM))
+			{
+				$results_array[] = $row;
+			}
+			return $results_array;
+		}
+		return "?";
+	}
+	
+	
 	public function Result($result,$rowOffset=0,$fieldOffset=0)
 	{
 		if ( $result )
 		{
-            $i = 0;
-            while (  $i < $rowOffset  )
-            {
-                $result->fetch_row();
-                $i++;
-            }
-            return $result->fetch_row()[$fieldOffset];
+			$results_array = array();
+			while ($row = $result->fetch_array(MYSQLI_NUM))
+			{
+				$results_array[] = $row;
+			}
+			if ( array_key_exists($rowOffset,$results_array) )
+			{
+				return $results_array[$rowOffset][$fieldOffset];
+			}
 		}
 		return "?";
 	}
@@ -89,9 +106,7 @@ class SqlServer extends Framework
 	
 	public function Query($query)
 	{
-		$result = $this->mysqli->query($query);
-		//$this->debugger->Log("MYSQLI_QUERY " . $query . " Error? => " . mysql_error() . "Rows : " . mysql_num_rows($result) );
-		return $result;
+		return $this->mysqli->query($query);
 	}
 	
 	public function __construct($autoConnect=false,$hostname=constant_serverSqlHostname)

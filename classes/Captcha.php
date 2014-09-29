@@ -37,6 +37,16 @@ class Captcha
         $captchaDiv = new Element("div",array("id"=>"captcha-box","class"=>"contact-box"));
         $captchaDiv->AddElement($captchaLabel);
 
+
+
+        if ( false )
+        {
+            $captchaError = new Element("div",array("class"=>"contact-error"));
+            $captchaErrorString = new Element("span",array(),$formErrors[constant_contact_captchaName]);
+            $captchaError->AddElement($captchaErrorString);
+            $captchaDiv->AddElement($captchaError);
+        }
+
         $captchaInner = new Element("div",array("id"=>"captcha-inner"));
         $captchaInner->AddElement($captchaButtonContainer);
         $captchaInner->AddElement($captchaImg);
@@ -47,14 +57,3 @@ class Captcha
     }
 }
 
-
-
-
-
-if ( array_key_exists(constant_register_captchaName,$formErrors) )
-{
-    $captchaError = new Element("div",array("class"=>"contact-error"));
-    $captchaErrorString = new Element("span",array(),$formErrors[constant_contact_captchaName]);
-    $captchaError->AddElement($captchaErrorString);
-    $captchaDiv->AddElement($captchaError);
-}
