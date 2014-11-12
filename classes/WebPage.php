@@ -111,7 +111,7 @@ class WebPage
 		----------------------------------------------*/
 		
 		// A webpage starts with the html tag
-		$this->html = new Element("html");
+		$this->html = new Element("html",array("lang"=>$this->language->CurrentLanguage()));
 		//
 		// 
 		//

@@ -1,6 +1,6 @@
 <?php
 
-class HttpMethod extends Framework
+class HttpMethod
 {
 	private $methodData;
 	

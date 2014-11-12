@@ -51,6 +51,25 @@ class PhpClosure {
   var $_debug = true;
   var $_cache_dir = "";
   var $_code_url_prefix = "";
+  
+  public static function CompileString($script,$advanced)
+  {
+  		$ch = curl_init("http://closure-compiler.appspot.com/compile");
+  	
+  		$compileLevel = "SIMPLE_OPTIMIZATIONS";
+  		if ( $advanced )
+  		{
+  			$compileLevel = "ADVANCED_OPTIMIZATIONS";
+  		}
+  	
+  		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  		curl_setopt($ch, CURLOPT_POST, 1);
+  		curl_setopt($ch, CURLOPT_POSTFIELDS, "output_info=compiled_code&output_format=text&compilation_level=" . $compileLevel  . "&js_code=" . urlencode($script));
+  		$output = curl_exec($ch);
+  		curl_close($ch);
+  	
+  		return $output;
+  }
 
   function PhpClosure() { }
 
@@ -335,6 +354,7 @@ class PhpClosure {
     }
     return implode("&", $params);
   }
+  
 
   function _getParamList() {
     $params = array();

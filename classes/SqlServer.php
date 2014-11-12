@@ -109,6 +109,15 @@ class SqlServer extends Framework
 		return $this->mysqli->query($query);
 	}
 	
+	public function Prepare($query,$data)
+	{
+		$stmt = $this->mysqli->prepare("INSERT INTO table (column) VALUES (?)");
+		$stmt->bind_param("s",$data);
+		$stmt->execute();
+		$stmt->close();
+		return $stmt;
+	}
+	
 	public function __construct($autoConnect=false,$hostname=constant_serverSqlHostname)
 	{
 		$this->isConnected = false;
