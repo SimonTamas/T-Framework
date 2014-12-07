@@ -8,6 +8,7 @@ class WebPage
 	private $pageName;
 	private $session;
 	private $obfuscatePage;
+	private $httpMethod;
 	
 	private static $_instance = NULL;
 
@@ -40,6 +41,15 @@ class WebPage
 	public function Session()
 	{
 		return $this->session;
+	}
+	
+	public function GetHttpMethod()
+	{
+		if ( $this->httpMethod == null )
+		{
+			$this->httpMethod = new HttpMethod();
+		}
+		return $this->httpMethod;
 	}
 	
 	public function GetHTML($obfuscated=false)

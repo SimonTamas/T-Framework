@@ -111,10 +111,9 @@ class SqlServer extends Framework
 	
 	public function Prepare($query,$data)
 	{
-		$stmt = $this->mysqli->prepare("INSERT INTO table (column) VALUES (?)");
+		$stmt = $this->mysqli->prepare($query);
 		$stmt->bind_param("s",$data);
 		$stmt->execute();
-		$stmt->close();
 		return $stmt;
 	}
 	

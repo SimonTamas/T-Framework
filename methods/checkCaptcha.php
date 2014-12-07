@@ -2,25 +2,33 @@
 
 session_start();
 
-if ( isset($_SESSION["twork_securityCode"]) )
+if ( isset($_GET["var"]) )
 {
-	if ( isset($_POST["code"]) )	
+	$varName = $_GET["var"];
+	if ( isset($_SESSION[$varName]) )
 	{
-		if ( $_SESSION["twork_securityCode"] == ($_POST["code"] ))
+		if ( isset($_GET["code"]) )	
 		{
-			echo "code_correct";
-		}
-		else
+			if ( $_SESSION[$varName] == ($_GET["code"] ))
+			{
+				echo "code_correct";
+			}
+			else
+			{
+				echo "code_incorrect";
+			}
+		}	
+		else 
 		{
-			echo "code_incorrect";
-		}
-	}	
-	else 
+			echo "code_notSet";
+		}	
+	}
+	else
 	{
-		echo "code_notSet";
-	}	
+		echo "securityCode_notSet";
+	}
 }
 else
 {
-	echo "securityCode_notSet";
+	"varName_notSet";
 }

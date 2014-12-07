@@ -69,6 +69,21 @@ class Language extends Framework
 		$this->SetElementsLanguage($setTo);
 	}
 	
+	public static function GetTextForLanguage($key,$language)
+	{
+		$sql = new SqlServer(true);
+		$langQuery = $sql->Query("SELECT " . $language . " FROM language WHERE langKey = '$key'");
+		$sql->Disconnect();
+		if ( $sql->NumRows($langQuery) > 0 )
+		{
+			return mysql_real_escape_string($sql->Result($langQuery));
+		}
+		else
+		{
+			return "?";
+		}
+	}
+	
 	public function GetText($key,$elem=NULL,$requestLanguage=NULL)
 	{
 		$sql = new SqlServer(true);

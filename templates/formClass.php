@@ -6,6 +6,7 @@ class Form
 	private $identifier;
 	private $structure;
 	private $httpMethods;
+	private $errors;
 	
 	public function CheckAccount($settings)
 	{
@@ -16,7 +17,7 @@ class Form
 			$correctFormat = true;
 			if ( array_key_exists("type", $settings))
 			{
-				if ( $settings["type"] == "email" && filter_var($val, FILTER_VALIDATE_EMAIL) )
+				if ( $settings["type"] == "email" && filter_var($val, FILTER_VALIDATE_EMAIL) == false )
 				{
 					$correctFormat = false;
 				}
@@ -29,11 +30,13 @@ class Form
 						$valLen = strlen($val);
 						if ( $valLen > $max )
 						{
-							return "ERROR-USER-LONG";
+							//return "ERROR-USER-LONG";
+							return $this->webPage->GetLanguage()->GetText($this->identifier."account-long");
 						}
 						else if ( $valLen < $min )
 						{
-							return "ERROR-USER-SHORT";
+							//return "ERROR-USER-SHORT";
+							return $this->webPage->GetLanguage()->GetText($this->identifier."account-short");
 						}
 					}
 				}
@@ -41,11 +44,11 @@ class Form
 			if ( $correctFormat )
 			{
 				$sql = new SqlServer(true);
-				$accountExistsSTMT = $sql->Prepare("SELECT COUNT() FROM accounts WHERE user = ?",$user);
-				if ( $accountExistsSTMT->num_rows > 0 )
+				$accountExists = $sql->Query($settings["query"]);
+				if ( $accountExists && $accountExists->num_rows > 0 )
 				{
-					// Account exists
-					return "ERROR-USER-EXISTS";
+					//"ERROR-USER-EXISTS";
+					return $this->webPage->GetLanguage()->GetText($this->identifier."account-exists");
 				}
 				else
 				{
@@ -54,23 +57,112 @@ class Form
 			}
 			else
 			{
-				return "ERROR-USER-FORMAT";
+				//"ERROR-USER-FORMAT";
+				return $this->webPage->GetLanguage()->GetText($this->identifier."account-format");
 			}
 		}
 		else
 		{
-			"ERROR-USER-NOT-SET";
+			//"ERROR-USER-NOT-SET";
+			return $this->webPage->GetLanguage()->GetText($this->identifier."account-set");
 		}
 	}
 	
 	public function CheckPasswords($settings)
 	{
-		
+		$name = $this->identifier.$settings["name"]."1";
+		if ( $this->httpMethods->HasValue($name) )
+		{
+			$val = $this->httpMethods->GetValue($name);
+			if ( array_key_exists("length", $settings) )
+			{
+				$min = $settings["length"][0];
+				$max = $settings["length"][1];
+				$valLen = strlen($val);
+				if ( $valLen > $max )
+				{
+					//return "ERROR-PASS-LONG";
+					return $this->webPage->GetLanguage()->GetText($this->identifier."password-long");
+				}
+				else if ( $valLen < $min )
+				{
+					//return "ERROR-PASS-SHORT";
+					return $this->webPage->GetLanguage()->GetText($this->identifier."password-short");
+				}
+			}
+			$name2 = $this->identifier.$settings["name"]."2";
+			$val2 = $this->httpMethods->GetValue($name2);
+			if ( $val != $val2  )
+			{
+				//return "ERROR-PASS-MATCH";
+				return $this->webPage->GetLanguage()->GetText($this->identifier."password-match");
+			}
+			return true;
+		}
+		else
+		{
+			//return "ERROR-PASS-N0T-SET";
+			return $this->webPage->GetLanguage()->GetText($this->identifier."password-set");
+		}
+	}
+	
+	public function CheckCaptcha($settings)
+	{
+		$name = $this->identifier.$settings["name"];
+		if ( $this->httpMethods->HasValue($name) )
+		{
+			$val = $this->httpMethods->GetValue($name);
+			if ( Session::Exists($name)  )
+			{
+				if ( in_array($val,Session::Get($name)) )
+				{
+					return true;
+				}
+				else
+				{
+					//return "ERROR-CAPTCHA-MATCH";
+					return $this->webPage->GetLanguage()->GetText($this->identifier."captcha-match");
+				}
+			}
+			else
+			{
+				// return "ERROR-SESSION-SET"
+				return "Framework error - Captcha Session Missing";
+			}
+		}
+		else
+		{
+			//return "ERROR-CAPTCHA-N0T-SET";
+			return $this->webPage->GetLanguage()->GetText($this->identifier."captcha-set");
+		}
 	}
 	
 	public function CheckInput($settings)
 	{
-		
+		$name = $this->identifier.$settings["name"];
+		if ( $this->httpMethods->HasValue($name) )
+		{
+			$val = $this->httpMethods->GetValue($name);
+			if ( array_key_exists("length", $settings) )
+			{
+				$min = $settings["length"][0];
+				$max = $settings["length"][1];
+				$valLen = strlen($val);
+				if ( $valLen > $max )
+				{
+					return $this->webPage->GetLanguage()->GetText($this->identifier."input-long");
+				}
+				else if ( $valLen < $min )
+				{
+					return $this->webPage->GetLanguage()->GetText($this->identifier."input-short");
+				}
+			}
+		}
+		else
+		{
+			return $this->webPage->GetLanguage()->GetText($this->identifier."input-set");
+		}
+		return true;
 	}
 	
 	public function CheckPosts($settings)
@@ -91,11 +183,14 @@ class Form
 				break;
 					
 			case "group" :
+				$groupResult = [];
 				for ( $i = 0 ; $i < count($settings) ; $i++ )
 				{
 					$setting = $settings[$i];
-					$this->CheckPosts($setting);
+					$partCorrect = $this->CheckPosts($setting);
+					$groupResult[$i] = $partCorrect;
 				}
+				return $groupResult;
 				break;
 		
 			case "account" :
@@ -104,29 +199,60 @@ class Form
 				break;
 					
 			case "password" :
-				$this->CheckPasswords($settings);
+				$settings["name"] = "password";
+				return $this->CheckPasswords($settings);
 				break;
 					
 			case "serial" :
 				break;
+				
+			case "captcha" :
+				$settings["name"] = "captcha";
+				return $this->CheckCaptcha($settings);
+				break;
 		}
+		return true;
 	}
 	
-	public function GetState()
+	public function HasError($key)
+	{
+		if ( $this->errors )
+		{
+			if ( array_key_exists($key, $this->errors) )
+			{
+				return $this->errors[$key];
+			}
+		}
+		return false;
+	}
+	
+	public function GetFormErrors()
 	{
 		$this->httpMethods = new HttpMethod();
-		if ( $this->httpMethods->HasValue($this->identifier."send") )
+		if ( $this->httpMethods->WasSent($this->identifier."send") )
 		{
+			$formErrors = [];
 			foreach ( $this->structure as $groupName => $groupStructure )
 			{
 				for( $i = 0 ; $i < count($groupStructure) ; $i++ )
 				{
 					$structure = $groupStructure[$i];
-					$structureCorrect = $this->CheckPosts($structure);
+					$structureState = $this->CheckPosts($structure);
+					// If the value isn't true then something 
+					// didn't meet the forms requirements !
+					
+					if ( $structureState !== true )
+					{
+						if ( array_key_exists("name", $structure)) 
+						{
+							$formErrors[$structure["name"]] = $structureState;
+						}
+					}
 				}
 			}
+			return $formErrors;
 		}
-		return false;
+		return null;
 	}
 	
 	public function CreateInput($settings)
@@ -145,7 +271,7 @@ class Form
         }
         else
         {
-        	$settings["langKey"] = $this->identifier . $settings["langKey"];
+        	$settings["langKey"] = $settings["langKey"];
         }
         
         // Get Label from DB
@@ -174,8 +300,16 @@ class Form
 		// Required is true by default
 		if ( !array_key_exists("required", $settings) || ( array_key_exists("required", $settings) && $settings["required"] ) )
 		{
-			$inputSettings["required"] = "required";
-			$boxLabel->AddElement(new Element("span",array("class"=>"required"),"*"));
+			if ( array_key_exists("required", $settings) && $settings["required"] !== true )
+			{
+				// Required is a number
+				$boxLabel->AddElement(new Element("span",array("class"=>"semi-required"),"*"));
+			}
+			else
+			{
+				$inputSettings["required"] = "required";
+				$boxLabel->AddElement(new Element("span",array("class"=>"required"),"*"));
+			}
 		}
 		
 		if ( $type == "number" )
@@ -210,10 +344,11 @@ class Form
 		
 		$boxInput = new Element("input",$inputSettings);
 		
-		// Error ?
 		
 		$box->AddElement($boxLabel);
 		$box->AddElement($boxInput);
+
+		
 		return $box;
 	}
 	
@@ -233,20 +368,12 @@ class Form
         }
 		
 		
-		$phoneText = $this->webPage->GetLanguage()->GetText($settings["langKey"]."-label");
-		$phoneLabel = new Element("label",array("for"=>$name),$phoneText);
-		
-		
-		
-		if ( !array_key_exists("required", $settings) || ( array_key_exists("required", $settings) && $settings["required"] ) )
-		{
-			$phoneLabel->AddElement(new Element("span",array("class"=>"required"),"*"));
-		}
-		$phoneBox->AddElement($phoneLabel);
 		
 		$phoneNumbers = new Element("div",array("id"=>$name."-container"));
 		$grouping = $settings["group"];
 		$sum = 0;
+		
+		
 		foreach ( $grouping as $i => $pack )
 		{
 			if ( is_array($pack) )
@@ -262,8 +389,17 @@ class Form
 				$sum += $pack;
 			}
 		}
+		
+
+		$firstPack = null;
 		foreach ( $grouping as $id => $pack )
 		{
+			
+			if ( $firstPack == null )
+			{
+				$firstPack = $id;
+			}
+			
 			$groupPattern = $maxLength = $pack;
 			if ( is_array($groupPattern) )
 			{
@@ -276,13 +412,12 @@ class Form
 			}
 			
 			
-			// Remove 10% for padding and margin;
-			$percent = floor((($maxLength*100)/$sum)) - 10;
-			
+			// Remove 6% for padding and margin;
+			$percent = floor((($maxLength*100)/$sum)) - 9;
 			
 			$packSettings = array
 			(
-				"id" => $name .  $id,
+				"id" => $name . $id,
 				"style" => "width:" . $percent  . "%",
 				"data-width" => $maxLength
 			);
@@ -299,6 +434,8 @@ class Form
 			if ( is_string($pack) )
 			{
 				$packSettings["value"] = $pack;
+				$packSettings["required"] = "required 
+						1";
 				$packSettings["disabled"] = "disabled";
 			}
 			else 
@@ -325,6 +462,17 @@ class Form
 			$phoneInputPack = new Element("input",$packSettings);
 			$phoneNumbers->AddElement($phoneInputPack);
 		}
+
+
+		$phoneText = $this->webPage->GetLanguage()->GetText($settings["langKey"]."-label");
+		$phoneLabel = new Element("label",array("for"=>$name . $firstPack),$phoneText);
+		
+		
+		if ( !array_key_exists("required", $settings) || ( array_key_exists("required", $settings) && $settings["required"] ) )
+		{
+			$phoneLabel->AddElement(new Element("span",array("class"=>"required"),"*"));
+		}
+		$phoneBox->AddElement($phoneLabel);
 		$phoneBox->AddElement($phoneNumbers);
 		return $phoneBox;
 	}
@@ -332,7 +480,7 @@ class Form
 	private function CreateSendButton($settings)
 	{
 		$name = "send-button";
-		$box = new Element("div",array("id"=>$name."-box","class"=>$this->identifier."box"));
+		$box = new Element("div",array("id"=>$this->identifier.$name."-box","class"=>$this->identifier."box"));
 		
 		$buttonText = $this->webPage->GetLanguage()->GetText($this->identifier."title");
 		$button = new Element("button",array("name"=>$this->identifier."send"),$buttonText);
@@ -345,6 +493,66 @@ class Form
 		return $box;
 	}
 	
+	private function CreateCaptcha($settings)
+	{
+		$settings["name"] = $this->identifier."captcha";
+		
+		// Get Label from DB
+		$labelText = $this->webPage->GetLanguage()->GetText($this->identifier."captcha-label");
+		
+		$box = new Element("div",array("id"=>$settings["name"]."-box","class"=>$this->identifier."box"));
+		$boxLabel = new Element("label",array("for"=>$settings["name"]),$labelText);
+		$boxLabel->AddElement(new Element("span",array("class"=>"required"),"*"));
+		$inputSettings = array
+		(
+			"id" => $settings["name"],
+			"required" => "required",
+			"name" => $settings["name"],
+			"type" => "text",
+			"placeholder" => $this->webPage->GetLanguage()->GetText($this->identifier."captcha-placeholder")
+		);
+		
+		
+		$request = "";
+		if ( array_key_exists("request", $settings) )
+		{
+			$request = $settings["request"];
+		}
+		$captchaImg = new Image(constant_websiteRoot . "captcha".$request,"","",array("id"=>$this->identifier."captcha-img"));
+		$captchaButton = new Element("button",array("id"=>$this->identifier."newCaptcha","type"=>"button","class"=>"button"));
+		$captchaInner = new Element("div",array("id"=>$this->identifier."captcha-inner","class"=>$this->identifier."box"));
+		$captchaInner->AddElement($captchaButton);
+		$captchaInner->AddElement($captchaImg);
+		
+		// Length
+		if ( array_key_exists("length", $settings))
+		{
+			$inputSettings["pattern"] = ".{" . $settings["length"][0] ."," . $settings["length"][1]. "}";
+			$inputSettings["title"] = $this->webPage->GetLanguage()->GetTextReplaced($this->identifier."captcha-title",
+				array
+				(
+					$settings["length"][0],
+					$settings["length"][1]
+				)
+			);
+		}
+		
+		$boxInput = new Element("input",$inputSettings);
+		
+		$containerBox = new Element("div",array("class"=>$this->identifier."box"));
+		
+		$box->AddElement($boxLabel);
+		$box->AddElement($boxInput);
+		
+
+		$containerBox->AddElement($captchaInner);
+		$containerBox->AddElement($box);
+		
+		
+		
+		return $containerBox;
+	}
+	
 	private function CreateBox($settings)
 	{
 		$type = "input";
@@ -352,7 +560,7 @@ class Form
 		{
 			$type = $settings["flag"];
 		}
-		else if ( !array_key_exists("name",$settings) )
+		else if ( !array_key_exists("name", $settings) )
 		{
 			$type = "group";
 		}
@@ -374,19 +582,26 @@ class Form
 				}
 				return $box;
 			break;
+			
+			case "captcha" :
+				return $this->CreateCaptcha($settings);
+			break;
 						
 			case "account" :
-				$settings["name"] = "user";
 				return $this->CreateInput($settings);
 				break;
 					
 			case "password" :
 				$settings["type"] = "password";
-				$settings["name"] = "password1";
+				
 				$box = new Element("div",array("class"=>$this->identifier."box"));
+
+				$settings["name"] = "password1";
 				$box->AddElement($this->CreateInput($settings));
 				$settings["name"] = "password2";
 				$box->AddElement($this->CreateInput($settings));
+				
+				
 				return $box;
 				break;
 					
@@ -399,8 +614,9 @@ class Form
 		}
 	}
 	
-	public function CreateForm()
+	public function CreateForm($formErrors)
 	{
+		$this->errors = $formErrors;
 		$form = new Element("form",array("id"=>$this->identifier."form","method"=>$this->method));
 		$counter = 0;
 		foreach ( $this->structure as $groupName => $groupStructure )
@@ -410,16 +626,36 @@ class Form
 			{
 				$titleType = "h2";
 			}
-			$groupTitle = new Element($titleType,array(),$this->webPage->GetLanguage()->GetText($groupName));
-			$form->AddElement($groupTitle);
+			$groupDiv = new Element("div",array("id"=>$this->identifier.$groupName."-container"));
+			
+			if ( !is_numeric($groupName) )
+			{
+				$groupTitle = new Element($titleType,array("id"=>$this->identifier.$groupName),$this->webPage->GetLanguage()->GetText($groupName));
+				$form->AddElement($groupTitle);
+			}
+			
 			for( $i = 0 ; $i < count($groupStructure) ; $i++ )
 			{
-				$elem = $this->CreateBox($groupStructure[$i]);
+				$elem = $this->CreateBox($groupStructure[$i]);				
 				if ( $elem )
 				{
-					$form->AddElement($elem);
+					if ( array_key_exists("name", $groupStructure[$i]) )
+					{
+						$error = $this->HasError($groupStructure[$i]["name"]);
+						if ( $error !== false )
+						{
+							// Van hiba
+							$errorDiv = new Element("div",array("id"=>$groupStructure[$i]["name"]."Error","class"=>$this->identifier."error"));
+							$errorSpan = new Element("span",array(),$error);
+							$errorDiv->AddElement($errorSpan);
+						
+							$elem->AddElement($errorDiv);
+						}
+					}
+					$groupDiv->AddElement($elem);
 				}
 			}
+			$form->AddElement($groupDiv);
 			$counter++;
 		}
 		return $form;

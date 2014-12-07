@@ -161,9 +161,18 @@ class SimpleCaptcha {
         $text = $this->GetCaptchaText();
         $fontcfg  = $this->fonts[array_rand($this->fonts)];
         $this->WriteText($text, $fontcfg);
+		
+		if ( isset($_GET["var"]) )
+		{
+			$this->session_var = $_GET["var"];
+		}
 
-        $_SESSION[$this->session_var] = $text;
-        
+        if ( !isset($_SESSION[$this->session_var]) )
+		{
+			$_SESSION[$this->session_var] = array();
+		}
+		
+		array_push($_SESSION[$this->session_var],$text);
 
         /** Transformations */
         if (!empty($this->lineWidth)) {
@@ -217,7 +226,20 @@ class SimpleCaptcha {
 
         // Foreground color
         $color = $this->colors[mt_rand(0, sizeof($this->colors)-1)];
-        $this->GdFgColor = imagecolorallocate($this->im, 5 , 185, 220);
+        
+        $redGet = 255;
+        $greenGet = 255;
+        $blueGet = 255;
+        
+        if ( isset($_GET["clr"]) )
+        {
+        	$colorData = explode(",",$_GET["clr"]);
+        	$redGet = $colorData[0];
+        	$greenGet = $colorData[1];
+        	$blueGet = $colorData[2];
+        }
+        
+        $this->GdFgColor = imagecolorallocate($this->im, $redGet , $greenGet, $blueGet);
 
         // Shadow color
         if (!empty($this->shadowColor) && is_array($this->shadowColor) && sizeof($this->shadowColor) >= 3) {
