@@ -3,10 +3,20 @@
 
 class Session
 {
-	public static function Get($key)
+	public static function Get($key,$fallback=null)
 	{
 		self::TryToContinue();
-		return $_SESSION[$key];
+		if ( self::Exists($key) )
+		{
+			return $_SESSION[$key];
+		}
+		return $fallback;
+	}
+	
+	public static function Destroy($key)
+	{
+		self::TryToContinue();
+		unset($_SESSION[$key]);
 	}
 	
 	public static function Set($key,$value)
@@ -19,6 +29,12 @@ class Session
 	{
 		self::TryToContinue();
 		return isset($_SESSION[$key]);
+	}
+	
+	public static function Id()
+	{
+		self::TryToContinue();
+		return session_id();
 	}
 	
 	private static function TryToContinue()

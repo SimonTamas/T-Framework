@@ -1,6 +1,6 @@
 <?php
 
-class Language extends Framework
+class Language
 {
 
 	private $lang;
@@ -37,7 +37,6 @@ class Language extends Framework
 	
 	public function TrySetLanguage($tryLang)
 	{
-		$sql = new SqlServer(true);
 		if ( $this->HasLanguage($tryLang) )
 		{
 			$this->SetLanguage($tryLang);
@@ -80,7 +79,7 @@ class Language extends Framework
 		}
 		else
 		{
-			return "?";
+			return $key;
 		}
 	}
 	
@@ -104,7 +103,7 @@ class Language extends Framework
 		}
 		else
 		{
-			return "?";
+			return $key;
 		}
 	}
 	
@@ -135,10 +134,12 @@ class Language extends Framework
 	public function __construct($setLang=constant_defaultLanguage)
 	{
 		$this->languages = array();
-		$this->InitLanguages();
+		$this->langElements = array();
 		
 		$this->lang = $setLang;
-		$this->langElements = array();
+		$this->InitLanguages();
+		
+		
 		//$this->CheckLocation();
 		
 		self::$languageID++;

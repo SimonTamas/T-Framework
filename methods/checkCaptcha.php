@@ -9,7 +9,7 @@ if ( isset($_GET["var"]) )
 	{
 		if ( isset($_GET["code"]) )	
 		{
-			if ( $_SESSION[$varName] == ($_GET["code"] ))
+			if ( in_array($_GET["code"],$_SESSION[$varName]))
 			{
 				echo "code_correct";
 			}

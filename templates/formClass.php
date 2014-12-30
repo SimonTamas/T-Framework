@@ -158,7 +158,7 @@ class Form
 				}
 			}
 		}
-		else
+		else if ( $settings["required"] )
 		{
 			return $this->webPage->GetLanguage()->GetText($this->identifier."input-set");
 		}
@@ -289,7 +289,7 @@ class Form
 		);
 		
 		// If method exists check for value
-		if ( $this->httpMethods )
+		if ( $type != "password" && $this->httpMethods )
 		{
 			if ( $this->httpMethods->HasValue($name) )
 			{

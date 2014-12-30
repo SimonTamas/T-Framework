@@ -16,39 +16,62 @@ class Cacher extends Framework
 		return str_replace(constant_websiteRoot,constant_documentRoot,$href);
 	}
 	
-	public static function FileNameFromHref($href,$type)
+	public static function FileNameFromHref($href)
 	{
-		return pathinfo($href)["filename"] . "." . $type;
+		return pathinfo($href)["filename"];
 	}
 	
 	public static function CacheExists($href,$type)
 	{
-		$fileName = self::FileNameFromHref($href,$type);
-		$filePath = constant_documentRoot . $type . "/" . $fileName ;
+		$fileName = self::FileNameFromHref($href);
+		$filePath = constant_documentRoot . $type . "/" . $fileName . "."  . $type ;
 		return file_exists($filePath);
 	}
 	
 	public static function CacheIsFresh($href,$type)
 	{
-		$fileName = self::FileNameFromHref($href,$type);
-		$cachePath = constant_documentRoot . $type . "/" . $fileName;
+		$fileName = self::FileNameFromHref($href);
+		$cachePath = constant_documentRoot . $type . "/"  . $fileName . "."  . $type ;
 		$srcPath = self::FilePathFromHref($href);
 		return file_exists($srcPath) && file_exists($cachePath) && filemtime($srcPath) - filemtime($cachePath) < 5;
 	}
 	
-	public static function CreateCache($href,$string,$type)
+	public static function CreateCache($href,$string,$type,$uniqueID="")
 	{
 		self::initFolder($type);
-		$fileName = self::FileNameFromHref($href,$type);	
-		$cacheFile = fopen(constant_documentRoot . $type . "/" .$fileName ,"w");
+		$fileName = self::FileNameFromHref($href);	
+		$filePath = constant_documentRoot . $type . "/" . $uniqueID .  $fileName . "."  . $type;
+		$cacheFile = fopen($filePath ,"w");
 		fwrite($cacheFile,$string);
 		fclose($cacheFile);
+		return $filePath;
 	}
 	
-	public static function GetCacheHref($href,$type)
+	public static function GetCacheHref($href,$type,$uniqueID="")
 	{
-		$fileName = self::FileNameFromHref($href,$type);
-		return constant_websiteRoot . $type . "/" . $fileName;
+		$fileName = self::FileNameFromHref($href);
+		return constant_websiteRoot . $type . "/" . $uniqueID . $fileName  . "."  . $type ; ;
+	}
+	
+	public static function GetOrRequire($href,$var,$webPage)
+	{
+		$lang = $webPage->GetLanguage()->CurrentLanguage();
+		$page = $webPage->PageName();
+		$uniqueID = $lang . "/" . $page . "/";
+		
+		if ( !Cacher::CacheExists($href,"html") || !Cacher::CacheIsFresh($href,"html") )
+		{
+			require($href);
+
+			self::initFolder("html/" . $lang );
+			self::initFolder("html/" . $lang . "/" . $page );
+			
+			return new Element("div",array(),file_get_contents(Cacher::CreateCache($href,$$var->GetHTML(),"html",$uniqueID)));
+		}
+		else
+		{
+			return new Element("div",array(),file_get_contents(Cacher::GetCacheHref($href,"html",$uniqueID)));
+		}
 	}
 	
 	public static function Cache($href,$type,$obfuscate=true,$compile=true,$advancedCompilation=false)

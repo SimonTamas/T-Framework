@@ -9,12 +9,29 @@ class WebPage
 	private $session;
 	private $obfuscatePage;
 	private $httpMethod;
+	private $sql;
 	
 	private static $_instance = NULL;
 
     public static function getInstance() 
     {
         return self::$_instance;
+    }
+    
+    public function IsLogd($key)
+    {
+    	return $this->session->Exists($key);
+    }
+    
+    public function GetSQL()
+    {
+    	return $this->sql;
+    }
+   
+    public function ReturnHome()
+    {
+    	header('Location: '.str_replace("index.php","",$_SERVER['PHP_SELF']));
+    	die;
     }
     
     public function PreLoadElements($type,$id="")
@@ -88,31 +105,47 @@ class WebPage
 	public function __construct($pageName,$pageLanguage=constant_defaultLanguage,$loadDefaults=true)
 	{
 		self::$_instance = $this;
-		Debugger::SetDocument($pageName);
+		//Debugger::SetDocument($pageName);
 		$this->language = new Language($pageLanguage);
+		if ( !$this->language->HasLanguage($pageLanguage))
+		{
+			// Maybe he wanted the page
+			if ( ElementsLoader::PageExists($this,$pageLanguage) )
+			{
+				$this->language = new Language(constant_defaultLanguage);
+				$pageName = $pageLanguage;
+			}
+			else
+			{
+				if ( Session::Exists("language") )
+				{
+					Session::Destroy("language");
+				}
+				$this->ReturnHome();
+			}
+		}
+		
 		// Since the pageName can be in different languages 
 		// we need to get the key from that pageName
 		
 		// Set pageName to be sure
 		$this->pageName = $pageName;
-		
-		// Create session
+		$this->sql = new SqlServer(true);
 		$this->session = new Session();
 		
-		$sql = new SqlServer(true);
+		
 		$languages = $this->GetLanguage()->Languages();
 		foreach ( $languages as $language )
 		{
 			$queryString = "SELECT langKey FROM language WHERE " . $language . " = '" . $pageName . "'";
-			$pageKeyQuery = $sql->Query($queryString);
-			if ( $sql->NumRows($pageKeyQuery) > 0 )
+			$pageKeyQuery = $this->sql->Query($queryString);
+			if ( $this->sql->NumRows($pageKeyQuery) > 0 )
 			{
 				// pageNames are enlisted as xyzPage (langKey) so remove the Page from the end
-				$this->pageName = str_replace("Page", "", $sql->Result($pageKeyQuery));
+				$this->pageName = str_replace("Page", "", $this->sql->Result($pageKeyQuery));
 				break;
 			}
 		}
-		$sql->Disconnect();
 		
 		
 		

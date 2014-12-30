@@ -11,6 +11,11 @@ class ElementsLoader extends Framework
 		}
 	}
 	
+	public static function PageExists($webPage,$pageName)
+	{
+		return file_exists(constant_pathToParts . $pageName);
+	}
+	
 	public function LoadElements($pageName,$pagePart)
 	{
 		
