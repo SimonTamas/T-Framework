@@ -21,17 +21,17 @@ class Cacher extends Framework
 		return pathinfo($href)["filename"];
 	}
 	
-	public static function CacheExists($href,$type)
+	public static function CacheExists($href,$type,$uniqueID="")
 	{
 		$fileName = self::FileNameFromHref($href);
-		$filePath = constant_documentRoot . $type . "/" . $fileName . "."  . $type ;
+		$filePath = constant_documentRoot . $type . "/" . $uniqueID .  $fileName . "."  . $type ;
 		return file_exists($filePath);
 	}
 	
-	public static function CacheIsFresh($href,$type)
+	public static function CacheIsFresh($href,$type,$uniqueID="")
 	{
 		$fileName = self::FileNameFromHref($href);
-		$cachePath = constant_documentRoot . $type . "/"  . $fileName . "."  . $type ;
+		$cachePath = constant_documentRoot . $type . "/"  . $uniqueID . $fileName . "."  . $type ;
 		$srcPath = self::FilePathFromHref($href);
 		return file_exists($srcPath) && file_exists($cachePath) && filemtime($srcPath) - filemtime($cachePath) < 5;
 	}
@@ -59,7 +59,7 @@ class Cacher extends Framework
 		$page = $webPage->PageName();
 		$uniqueID = $lang . "/" . $page . "/";
 		
-		if ( !Cacher::CacheExists($href,"html") || !Cacher::CacheIsFresh($href,"html") )
+		if ( !Cacher::CacheExists($href,"html",$uniqueID) || !Cacher::CacheIsFresh($href,"html",$uniqueID) )
 		{
 			require($href);
 
