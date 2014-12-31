@@ -66,11 +66,12 @@ class Cacher extends Framework
 			self::initFolder("html/" . $lang );
 			self::initFolder("html/" . $lang . "/" . $page );
 			
-			return new Element("div",array(),file_get_contents(Cacher::CreateCache($href,$$var->GetHTML(),"html",$uniqueID)));
+			$html = $$var->GetHTML();
+			return new Element("",array(),$html);
 		}
 		else
 		{
-			return new Element("div",array(),file_get_contents(Cacher::GetCacheHref($href,"html",$uniqueID)));
+			return new Element("",array(),file_get_contents(Cacher::GetCacheHref($href,"html",$uniqueID)));
 		}
 	}
 	

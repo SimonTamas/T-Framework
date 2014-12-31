@@ -151,6 +151,10 @@ class Element extends Framework
 		{
 			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::endTag;
 		}
+		else if ( $this->IsEmptyElement() )
+		{
+			return "";
+		}
 		else
 		{
 			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::closeTag;	
@@ -164,6 +168,15 @@ class Element extends Framework
 		{
 			return self::startEndTag . $this->Type(). self::closeTag;
 		}
+		else if ( $this->IsEmptyElement() )
+		{
+			return "";
+		}
+	}
+	
+	public function IsEmptyElement()
+	{
+		return $this->elementTypeString == "";
 	}
 	
 	public function AddElement($element)
