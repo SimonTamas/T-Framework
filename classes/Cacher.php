@@ -53,21 +53,22 @@ class Cacher extends Framework
 		return constant_websiteRoot . $type . "/" . $uniqueID . $fileName  . "."  . $type ; ;
 	}
 	
-	public static function GetOrRequire($href,$var,$webPage)
+	public static function GetOrRequire($href,$var,$webPage,$uniqueID="")
 	{
-		$lang = $webPage->GetLanguage()->CurrentLanguage();
-		$page = $webPage->PageName();
-		$uniqueID = $lang . "/" . $page . "/";
-		
 		if ( !Cacher::CacheExists($href,"html",$uniqueID) || !Cacher::CacheIsFresh($href,"html",$uniqueID) )
 		{
 			require($href);
-
-			self::initFolder("html/" . $lang );
-			self::initFolder("html/" . $lang . "/" . $page );
 			
-			$html = $$var->GetHTML();
-			return new Element("",array(),$html);
+			$folderPath = explode("/",$uniqueID);
+			$folderCreate = "";
+			foreach ( $folderPath as $folder )
+			{
+				$folderCreate .= $folder;
+				self::initFolder("html/" . $folderCreate);
+				$folderCreate .= "/";
+			}
+			
+			return new Element("",array(),file_get_contents(Cacher::CreateCache($href,$$var->GetHTML(),"html",$uniqueID)));
 		}
 		else
 		{
