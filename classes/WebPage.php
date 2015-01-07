@@ -161,11 +161,6 @@ class WebPage
 		// ------------------------- HEAD -------------------------	
 		$head = new Head();
 		$this->html->AddElement($head);
-		if ( $loadDefaults )
-		{
-			ElementsLoader::LoadElementsFrom($this,"default","head");
-		}
-		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"head");
 		// --------------------------------------------------------
 		//
 		//
@@ -183,14 +178,8 @@ class WebPage
 		
 		$header = new Element("header");
 		$wrapper->AddElement($header);
-		if ( $loadDefaults )
-		{
-			ElementsLoader::LoadElementsFrom($this,"default","header");
-		}
-		
 		$content = new Element("div",array( "id" => "content" ));
 		$wrapper->AddElement($content);
-		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"content");
 		// --------------------------------------------------------
 		//
 		//
@@ -198,11 +187,18 @@ class WebPage
 		// ----------------------- FOOTER -------------------------	
 		$footer = new Element("footer");
 		$body->AddElement($footer);
+		// --------------------------------------------------------
+		
+
 		if ( $loadDefaults )
 		{
+			ElementsLoader::LoadElementsFrom($this,"default","head");
+			ElementsLoader::LoadElementsFrom($this,"default","header");
 			ElementsLoader::LoadElementsFrom($this,"default","footer");
 		}
-		// --------------------------------------------------------
+		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"head");
+		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"content");
+		
 		
 	}
 }
