@@ -68,7 +68,7 @@ class Cacher extends Framework
 				$folderCreate .= "/";
 			}
 			
-			return new Element("",array(),file_get_contents(Cacher::CreateCache($href,$$var->GetHTML(),"html",$uniqueID)));
+			return new Element("",array(),file_get_contents(Cacher::CreateCache($href,$$var->GetHTML(Framework::$obfuscate),"html",$uniqueID)));
 		}
 		else
 		{

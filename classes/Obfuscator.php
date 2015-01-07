@@ -1,7 +1,7 @@
 <?php
 
 
-class Obfuscator extends Framework
+class Obfuscator
 {
 	public static $obfuscatedCache = array();
 	public static $nameExceptions = array("fb-root","fb-like-box");
