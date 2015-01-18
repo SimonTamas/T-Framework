@@ -29,7 +29,6 @@ class ElementProperties
 				return;
 			}
 		}
-		// Add debug : property not found
 	}
 	
 	public function RemovePropertyByName($propertyName)

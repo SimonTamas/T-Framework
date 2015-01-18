@@ -103,8 +103,6 @@ class Element
 		{
 			return false;
 		}
-		// Create Debug Log
-		$this->debugger->Log("404 CHILD ELEMENT Child was not found in : " . $this->GetElementProperties() . " => " .$type ."/" . $id,true);
 		return new Element("");
 	}
 		
@@ -187,9 +185,6 @@ class Element
 	public function AddElement($element)
 	{
 		array_push($this->elementChildren,$element);
-		
-		// Add to Debug
-		$this->debugger->Log("ELEMENT_ADDED " . $this->Type() . " (" . $this->GetElementProperties() ." ) addChild -> " .$element->Type() . " ( " . $element->GetElementProperties() .")");
 	}
 	
 	public function PrependElement($element)
