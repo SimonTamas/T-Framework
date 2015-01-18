@@ -1,6 +1,6 @@
 <?php
 
-class ElementsLoader extends Framework
+class ElementsLoader
 {
 	public static function LoadElementsFrom($webPage,$pageName,$pagePart)
 	{

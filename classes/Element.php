@@ -212,10 +212,6 @@ class Element
 				
 		$this->elementChildren = array();
 		$this->elementProperties = new ElementProperties($propertiesArray);
-		
-		// Create an instance of a debugger for the element
-		$elementIdentifier = $elementTypeString . "(id-" . $this->GetPropertyValue("id") .")";
-		$this->debugger = new Debugger(parent::$debugFramework,$elementIdentifier);
    	}
 }
 

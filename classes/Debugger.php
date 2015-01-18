@@ -1,6 +1,6 @@
 <?php
 
-class Debugger extends Framework
+class Debugger
 {
 	private $doDebug;
 	private $fileID;
