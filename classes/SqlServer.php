@@ -58,6 +58,20 @@ class SqlServer extends Framework
 		return "?";
 	}
 	
+	public static function ResultAssocArray($result)
+	{
+		if ( $result )
+		{
+			$results_array = array();
+			while ($row = $result->fetch_assoc())
+			{
+				$results_array[] = $row;
+			}
+			return $results_array;
+		}
+		return "?";
+	}
+	
 	
 	public function Result($result,$rowOffset=0,$fieldOffset=0)
 	{

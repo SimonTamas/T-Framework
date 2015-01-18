@@ -73,7 +73,6 @@ class WebPage
 	{
 		$html = "<!DOCTYPE html>" . $this->html->GetHTML($obfuscated);
 		return $html;
-		//return Framework::Minify($html);
 	}
 	
 	public function SetTitle($setTo)
@@ -101,19 +100,48 @@ class WebPage
 	{
 		return $this->pageName;
 	}
+	
+	public function GetDefaultPageName($fromName)
+	{
+		$languages = $this->GetLanguage()->Languages();
+		foreach ( $languages as $language )
+		{
+			$queryString = "SELECT langKey FROM language WHERE " . $language . " = '" . $fromName . "'";
+			$pageKeyQuery = $this->sql->Query($queryString);
+			if ( $this->sql->NumRows($pageKeyQuery) > 0 )
+			{
+				// pageNames are enlisted as xyzPage (langKey) so remove the Page from the end
+				return array(
+					"page" => str_replace("Page", "", $this->sql->Result($pageKeyQuery)),
+					"lang" => $language
+				);
+			}
+		}
+	}
 
 	public function __construct($pageName,$pageLanguage=constant_defaultLanguage,$loadDefaults=true)
 	{
 		self::$_instance = $this;
+
+		$this->sql = new SqlServer(true);
+		$this->session = new Session();
+		
 		//Debugger::SetDocument($pageName);
 		$this->language = new Language($pageLanguage);
 		if ( !$this->language->HasLanguage($pageLanguage))
 		{
+			/*
+			 *
+			 *  LANGUAGE IS BAD
+			 *
+			 */
+			
 			// Maybe he wanted the page
-			if ( ElementsLoader::PageExists($this,$pageLanguage) )
+			$tryPageData = $this->GetDefaultPageName($pageLanguage);
+			if ( ElementsLoader::PageExists($this,$tryPageData["page"]) )
 			{
-				$this->language = new Language(constant_defaultLanguage);
-				$pageName = $pageLanguage;
+				$this->language->SetLanguage($tryPageData["lang"]);
+				$this->pageName = $tryPageData["page"];
 			}
 			else
 			{
@@ -124,28 +152,30 @@ class WebPage
 				$this->ReturnHome();
 			}
 		}
-		
-		// Since the pageName can be in different languages 
-		// we need to get the key from that pageName
-		
-		// Set pageName to be sure
-		$this->pageName = $pageName;
-		$this->sql = new SqlServer(true);
-		$this->session = new Session();
-		
-		
-		$languages = $this->GetLanguage()->Languages();
-		foreach ( $languages as $language )
+		else
 		{
-			$queryString = "SELECT langKey FROM language WHERE " . $language . " = '" . $pageName . "'";
-			$pageKeyQuery = $this->sql->Query($queryString);
-			if ( $this->sql->NumRows($pageKeyQuery) > 0 )
+			/*
+			 * 
+			 *  LANGUAGE IS GOOD 
+			 * 
+			 */
+			
+			// Since the pageName can be in different languages
+			// we need to get the key from that pageName
+			// Set pageName to be sure
+			$pageData = $this->GetDefaultPageName($pageName);
+			if ( ElementsLoader::PageExists($this,$pageData["page"]) )
 			{
-				// pageNames are enlisted as xyzPage (langKey) so remove the Page from the end
-				$this->pageName = str_replace("Page", "", $this->sql->Result($pageKeyQuery));
-				break;
+				$this->pageName = $pageData["page"];
+				$this->language->SetLanguage($pageData["lang"]);
+			}
+			else
+			{
+				$defaultData = $this->GetDefaultPageName(constant_defaultPage);
+				$this->pageName = $defaultData["page"];
 			}
 		}
+		
 		
 		
 		
@@ -197,6 +227,7 @@ class WebPage
 			ElementsLoader::LoadElementsFrom($this,"default","footer");
 		}
 		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"head");
+		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"header");
 		ElementsLoader::LoadElementsFrom($this,$this->PageName(),"content");
 		
 		

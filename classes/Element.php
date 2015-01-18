@@ -38,6 +38,11 @@ class Element extends Framework
 		return $this->elementProperties;
 	}
 	
+	public function AddProperty($property)
+	{
+		$this->elementProperties->AddProperty($property);
+	}
+	
 	public function GetChildElement($type,$id="")
 	{
 		for ( $i = 0 ; $i < count($this->elementChildren) ; $i++ )
@@ -147,13 +152,13 @@ class Element extends Framework
 		
 	public function GetElementStartTag($obfuscate=false)
 	{
-		if ( $this->IsVoidElement() )
-		{
-			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::endTag;
-		}
-		else if ( $this->IsEmptyElement() )
+		if ( $this->IsEmptyElement() )
 		{
 			return "";
+		}
+		else if ( $this->IsVoidElement() )
+		{
+			return self::startTag . $this->Type() . $this->GetElementProperties($obfuscate) . self::endTag;
 		}
 		else
 		{
@@ -164,13 +169,13 @@ class Element extends Framework
 	
 	public function GetElementEndTag()
 	{
-		if ( ! $this->IsVoidElement() )
-		{
-			return self::startEndTag . $this->Type(). self::closeTag;
-		}
-		else if ( $this->IsEmptyElement() )
+		if ( $this->IsEmptyElement() )
 		{
 			return "";
+		}
+		else if ( ! $this->IsVoidElement() )
+		{
+			return self::startEndTag . $this->Type(). self::closeTag;
 		}
 	}
 	

@@ -53,19 +53,9 @@ class Language
 		return count($this->languages);
 	}
 	
-	public function SetElementsLanguage($setTo)
-	{
-		foreach ( $this->langElements as $elem )
-		{
-			//$element = $this->langElements[$elem];
-			//$element->SetHTML($this->GetText($elem));
-		}
-	}
-	
 	public function SetLanguage($setTo)
 	{
 		$this->lang = $setTo;
-		$this->SetElementsLanguage($setTo);
 	}
 	
 	public static function GetTextForLanguage($key,$language)
