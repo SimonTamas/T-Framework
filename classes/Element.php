@@ -1,6 +1,6 @@
 <?php
 
-class Element extends Framework
+class Element
 {	
 	const startTag = "<";
 	const startEndTag = "</";
